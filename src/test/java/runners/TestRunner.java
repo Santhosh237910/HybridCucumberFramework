@@ -14,8 +14,8 @@ import org.testng.annotations.DataProvider;
         monochrome = true,
         plugin = {
                 "pretty",
-                "html:target/cucumber-reports.html",
-                "json:target/cucumber.json",
+                "html:target/cucumber-html-reports.html",
+                "json:target/cucumber-json/cucumber.json",
                 "rerun:target/rerun.txt",
                 "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
         },
