@@ -16,7 +16,8 @@ import org.testng.annotations.DataProvider;
                 "pretty",
                 "html:target/cucumber-reports.html",
                 "json:target/cucumber.json",
-                "rerun:target/rerun.txt"
+                "rerun:target/rerun.txt",
+                "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
         },
         tags = "@invalidLogin"
 )
