@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--if cucumber scenario example has only one test data or runner file has only one test, it will execute only once even thread-count is 3-->
+<suite name="HybridCucumberSuite" parallel="tests" thread-count="3">
+    <!-- You can increase thread-count based on your CPU cores -->
+    <test name="CucumberTests">
+        <classes>
+            <class name="runners.TestRunner"/>
+        </classes>
+    </test>
+</suite>

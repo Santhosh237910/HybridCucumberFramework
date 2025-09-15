@@ -1,0 +1,51 @@
+HybridCucumberFramework/
+│── pom.xml                           # Dependencies: Selenium, RestAssured, JDBC, TestNG, Cucumber
+│── testng.xml                        # TestNG suite (parallel/thread-count setup)
+│
+├── src/main/java
+│   ├── base/
+│   │   ├── DriverFactory.java         # ThreadLocal WebDriver creation/teardown
+│   │   ├── ApiClient.java             # RestAssured base setup
+│   │   └── DBUtils.java               # JDBC DB utilities
+│   │
+│   ├── pages/
+│   │   ├── LoginPage.java             # Page Object → login actions
+│   │   └── DashboardPage.java         # Page Object → dashboard actions
+│   │
+│   ├── utils/
+│   │   ├── ConfigReader.java          # Reads config.properties
+│   │   ├── ExcelUtils.java            # Reads testdata.xlsx
+│   │   ├── JsonUtils.java             # Parses JSON test data
+│   │   └── LogHelper.java             # Centralized logging (log4j2)
+│
+├── src/test/java
+│   ├── context/
+│   │   └── TestContext.java           # Scenario context (thread-safe storage)
+│   │
+│   ├── managers/
+│   │   └── PageObjectManager.java     # Supplies Page Objects to step defs
+│   │
+│   ├── features/
+│   │   ├── Login.feature              # UI login feature
+│   │   ├── UserApi.feature            # API feature
+│   │   └── DBValidation.feature       # DB feature
+│   │
+│   ├── stepdefinitions/
+│   │   ├── LoginSteps.java            # Step defs for Login.feature
+│   │   ├── UserApiSteps.java          # Step defs for UserApi.feature
+│   │   └── DbSteps.java               # Step defs for DBValidation.feature
+│   │
+│   ├── hooks/
+│   │   └── ApplicationHooks.java      # @Before/@After → WebDriver + Screenshot
+│   │
+│   ├── runners/
+│   │   ├── TestRunner.java            # Main Cucumber TestNG runner
+│   │   └── FailedTestRunner.java      # Rerun failed tests (uses rerun.txt)
+│   │
+│   └── tests/
+│       └── HybridTests.java           # Optional pure TestNG tests
+│
+└── src/test/resources/
+    ├── config.properties              # App URLs, browser, DB, API configs
+    ├── testdata.xlsx                  # External test data
+    └── log4j2.xml                     # Logging config
