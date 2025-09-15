@@ -170,7 +170,6 @@
                             <jsonFiles>
                                 <param>${project.build.directory}/cucumber-json/*.json</param>
                             </jsonFiles>
-                            <parallelTesting>false</parallelTesting>
                         </configuration>
                     </execution>
                 </executions>
