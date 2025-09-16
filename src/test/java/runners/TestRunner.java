@@ -15,7 +15,7 @@ import org.testng.annotations.DataProvider;
         plugin = {
                 "pretty",
                 "html:target/cucumber-html-reports.html",
-                "json:target/cucumber-json/cucumber.json",
+                "json:target/cucumber-reports/cucumber.json",
                 "rerun:target/rerun.txt",
                 "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
         },
