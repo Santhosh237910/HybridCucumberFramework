@@ -22,6 +22,9 @@ Thumbs.db
 allure-results/
 allure-report/
 
+#screenshots
+screenshots/
+
 # Cucumber reports (if you ever generate them)
 cucumber-reports/
 

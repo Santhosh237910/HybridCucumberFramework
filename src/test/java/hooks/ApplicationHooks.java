@@ -34,7 +34,8 @@ public class ApplicationHooks {
         DriverFactory.initDriver(browser, driverVersion);
         // 🔹 Launch env-specific base URL
         String baseUrl = ConfigReader.getEnvSpecific("baseUrl");
-        DriverFactory.getDriver().get(baseUrl+"/login");
+        logger.info("URL retrieved {}",baseUrl);
+        DriverFactory.getDriver().get(baseUrl); //Opens URL
         logger.info("Navigated to: {}", baseUrl);
     }
 

@@ -11,26 +11,6 @@ public class ProgramsPractice {
 
     static Logger logger = LogManager.getLogger(ProgramsPractice.class);
 
-    public static void main(String[] args) {
-//        int[] arr = {1, 2, 5, 3, 7, 10, 9};
-//        int secondLargestNo = findSecondLargestNo(arr);
-//        System.out.println(secondLargestNo);
-//        int secondLargestNoWithoutSortMethod = findSecondLargestNoWithoutSortingMethod(arr);
-//        System.out.println(secondLargestNoWithoutSortMethod);
-//        printFibonaciSeries(5);
-//        reverseAString("Santhosh");
-//        printCountOfDuplicateOccurrencesInAWord("Santhosh");
-//        printCountOfDuplicateOccurrencesInAWordUsingEntrySetMethod("Santhosh");
-//        printCountOfDuplicateOccurrencesInAWorIgnoringCasing("Santhosh");
-//        printCountOfDuplicateOccurrencesInAWordUsingEntrySetMethod("Santhosh");
-//        printOnlyDuplicateCharactersInAString("Santhosh");
-//        printPalindromePyramidPattern(5);
-//        swapTwoNumbersWithoutThirdVariable(5,4);
-//        swapTwoStringWithoutUsingThirdVariable("Santhosh", "Kumar");
-//        printInExpectedFormatFromAGivenString();
-//        capitalizeFirstLetterOfEachWordInASentence("kranthi kumar");
-//        capitalizeFirstLetterOfAWordInASentenceEfficientMethod("kranthi kumar");
-    }
 
     public static int findSecondLargestNoFromAnArrayUsingSortMethod(int[] arr) {
         logger.info("Print the second largest number from an array");
@@ -302,6 +282,59 @@ public class ProgramsPractice {
         System.out.println(sb); // print final capitalized sentence
     }
 
+    public static void reverseOfAString(String str) {
+//        String str = "virat";
+        /*
+        Output: tariv
+        Logic: Convert string to characters and print in reverse order
+        Java utils to be used:
+            toCharArray() - String class method
+            char[] - to store characters
+            for loop - to iterate each character
+         */
+        char[] charArray = str.toCharArray();
+
+//        System.out.print(charArray[4]);
+//        System.out.print(charArray[3]);
+//        System.out.print(charArray[2]);
+//        System.out.print(charArray[1]);
+//        System.out.print(charArray[0]);
+
+        /*
+        starting index - 4
+        ending index - 0
+        increment/decrement - decrement by
+        < - low to high
+        > - high to low
+         */
+
+        for (int i = charArray.length-1; i >= 0; i--) {
+            System.out.print(charArray[i]);
+        }
+
+    }
+
+    public static void main(String[] args) {
+//        int[] arr = {1, 2, 5, 3, 7, 10, 9};
+//        int secondLargestNo = findSecondLargestNo(arr);
+//        System.out.println(secondLargestNo);
+//        int secondLargestNoWithoutSortMethod = findSecondLargestNoWithoutSortingMethod(arr);
+//        System.out.println(secondLargestNoWithoutSortMethod);
+//        printFibonaciSeries(5);
+//        reverseAString("Santhosh");
+//        printCountOfDuplicateOccurrencesInAWord("Santhosh");
+//        printCountOfDuplicateOccurrencesInAWordUsingEntrySetMethod("Santhosh");
+//        printCountOfDuplicateOccurrencesInAWorIgnoringCasing("Santhosh");
+//        printCountOfDuplicateOccurrencesInAWordUsingEntrySetMethod("Santhosh");
+//        printOnlyDuplicateCharactersInAString("Santhosh");
+//        printPalindromePyramidPattern(5);
+//        swapTwoNumbersWithoutThirdVariable(5,4);
+//        swapTwoStringWithoutUsingThirdVariable("Santhosh", "Kumar");
+//        printInExpectedFormatFromAGivenString();
+//        capitalizeFirstLetterOfEachWordInASentence("kranthi kumar");
+//        capitalizeFirstLetterOfAWordInASentenceEfficientMethod("kranthi kumar");
+        reverseOfAString("Sravanthi");
+    }
 
 
 }

@@ -58,14 +58,24 @@ public class ConfigReader {
         return (value != null && !value.isBlank()) ? value : defaultValue;
     }
 
-    /** Get environment (qa/dev/stage/prod) */
+    /**
+     * Get environment (qa/dev/stage/prod)
+     */
     public static String getEnv() {
         return System.getProperty("env", properties.getProperty("env", "qa")).toLowerCase();
     }
 
-    /** Get env-specific property */
+    /**
+     * Get env-specific property
+     */
     public static String getEnvSpecific(String key) {
         String env = getEnv();
-        return properties.getProperty(key + "." + env);
+        String value = properties.getProperty(key + "." + env);
+        if (value == null || value.trim().isEmpty()) {
+            throw new RuntimeException("No property found for " + key + "." + env + "");
+        }
+        return value;
     }
+
+    ;
 }
