@@ -62,7 +62,7 @@ public class ConfigReader {
      * Get environment (qa/dev/stage/prod)
      */
     public static String getEnv() {
-        return System.getProperty("env", properties.getProperty("env", "qa")).toLowerCase();
+        return System.getProperty("env", properties.getProperty("env", "QA"));
     }
 
     /**
