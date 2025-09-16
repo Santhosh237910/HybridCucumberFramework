@@ -1,7 +1,7 @@
 package hooks;
 
-import context.TestContext;
 import base.DriverFactory;
+import context.TestContext;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -13,71 +13,95 @@ import utils.ConfigReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Cucumber hooks for setting up and tearing down scenarios
+ * - @Before: Launch browser and navigate to base URL
+ * - @After: Capture screenshots on failure, quit browser, clear TestContext
+ */
 public class ApplicationHooks {
 
     private static final Logger logger = LogManager.getLogger(ApplicationHooks.class);
 
+    /**
+     * Runs before each scenario
+     * - Initializes WebDriver
+     * - Loads config properties
+     * - Opens base URL
+     */
     @Before
     public void setup() {
-        logger.info("Starting browser...");
+        logger.info("🔹 Starting browser...");
 
-        // Load browser and driver version from config
+        // Load config.properties (once per JVM, but safe to call multiple times)
         ConfigReader.loadProperties();
+
+        // Read browser and driver version from config
         String browser = ConfigReader.get("browser");
         String driverVersion = ConfigReader.get("driverVersion");
 
-        // Initialize WebDriver (Thread-safe)
+        // Initialize WebDriver (thread-safe via ThreadLocal)
         DriverFactory.initDriver(browser, driverVersion);
-        // 🔹 Launch env-specific base URL
+
+        // Launch environment-specific base URL
         String baseUrl = ConfigReader.getEnvSpecific("baseUrl");
-        logger.info("URL retrieved {}",baseUrl);
-        DriverFactory.getDriver().get(baseUrl); //Opens URL
-        logger.info("Navigated to: {}", baseUrl);
+        logger.info("Navigating to base URL: {}", baseUrl);
+        DriverFactory.getDriver().get(baseUrl);
     }
 
+    /**
+     * Runs after each scenario
+     * - Captures screenshot if scenario fails
+     * - Quits WebDriver
+     * - Clears scenario-specific TestContext
+     */
     @After
     public void tearDown(Scenario scenario) {
-        logger.info("Closing browser for scenario: {}", scenario.getName());
+        logger.info("🔹 Ending scenario: {}", scenario.getName());
 
-        // Capture screenshot on failure
         if (scenario.isFailed()) {
             logger.error("Scenario failed: {}", scenario.getName());
+
+            // Capture screenshot as bytes
             byte[] screenshot = ((TakesScreenshot) DriverFactory.getDriver())
                     .getScreenshotAs(OutputType.BYTES);
 
             // Attach to Cucumber report
             scenario.attach(screenshot, "image/png", "Failure screenshot");
 
-            // Save to file system
+            // Save to disk
             saveScreenshotToFile(screenshot, scenario.getName());
         } else {
             logger.info("Scenario passed: {}", scenario.getName());
         }
 
-        // Quit WebDriver
+        // Quit driver and remove from ThreadLocal
         DriverFactory.quitDriver();
 
-        // Clear TestContext for current thread
+        // Clear TestContext for thread safety
         TestContext.clear();
     }
 
-    /** Save screenshot to disk with timestamp */
+    /**
+     * Save screenshot to disk
+     * - Screenshots stored in target/screenshots/
+     * - File name includes sanitized scenario name + timestamp
+     */
     private void saveScreenshotToFile(byte[] screenshot, String scenarioName) {
         try {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String fileName = "screenshots/"
-                    + scenarioName.replaceAll("[^a-zA-Z0-9]", "_")
-                    + "_" + timestamp + ".png";
+            String sanitizedScenario = scenarioName.replaceAll("[^a-zA-Z0-9]", "_");
+            Path path = Path.of("target/screenshots", sanitizedScenario + "_" + timestamp + ".png");
 
-            // Create directories if not exists
-            Files.createDirectories(Paths.get(fileName).getParent());
+            // Ensure directories exist
+            Files.createDirectories(path.getParent());
 
-            // Write screenshot bytes to file
-            Files.write(Paths.get(fileName), screenshot);
+            // Write screenshot bytes
+            Files.write(path, screenshot);
+            logger.info("Screenshot saved to: {}", path);
         } catch (IOException e) {
             logger.error("Failed to save screenshot: {}", e.getMessage());
         }

@@ -1,83 +1,85 @@
 package pages;
 
+import base.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 /**
- * Page object for Login Page
- * Uses By locators and WebDriver for actions
+ * Page Object for Login Page
+ * - Encapsulates UI elements and actions for login
+ * - Inherits common waits and actions from BasePage
+ * - Includes retry logic for stable text entry
  */
-public class LoginPage {
-
-    private WebDriver driver;
+public class LoginPage extends BasePage {
 
     // Locators
-    private By usernameField = By.id("username");
-    private By passwordField = By.id("password");
-    private By loginButton = By.cssSelector("button[type='submit']");
-    private By errorMessage = By.id("flash");
+    private final By usernameField = By.id("username");
+    private final By passwordField = By.id("password");
+    private final By loginButton = By.cssSelector("button[type='submit']");
+    private final By errorMessage = By.id("flash");
 
+    // Constructor injects thread-specific WebDriver to BasePage
     public LoginPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver); // Pass driver to BasePage
     }
 
-    private WebElement waitForElement(By locator) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        return wait.until(ExpectedConditions.elementToBeClickable(locator));
-    }
-
-    protected void typeText(By locator, String text) {
-        for (int i = 0; i < 2; i++) {
+    /**
+     * Type text into input fields with retry logic
+     * Ensures stable input in case of transient issues
+     */
+    private void typeTextWithRetry(By locator, String text) {
+        for (int i = 0; i < 2; i++) { // Retry twice
             try {
-                WebElement element = waitForElement(locator); // waits until clickable
+                WebElement element = waitForClickable(locator); // Wait from BasePage
                 element.clear();
                 element.sendKeys(text);
 
-                // Verify text is actually entered
+                // Verify text is entered correctly
                 String value = element.getAttribute("value");
                 if (value != null && value.equals(text)) {
                     System.out.println("Thread " + Thread.currentThread().getId() +
                             " successfully entered: " + text);
-                    return; // success
+                    return; // Success
                 }
             } catch (Exception e) {
-                if (i == 1) throw e; // fail only after 2nd attempt
+                if (i == 1) throw e; // Fail only after 2nd attempt
             }
         }
     }
 
-//    public void enterUsername(String username) {
-//        WebElement userInput = waitForElement(usernameField);
-//        userInput.clear();
-//        userInput.sendKeys(username);
-//    }
-//
-//    public void enterPassword(String password) {
-//        WebElement passInput = waitForElement(passwordField);
-//        passInput.clear();
-//        passInput.sendKeys(password);
-//    }
-
+    /**
+     * Enter username
+     */
     public void enterUsername(String username) {
-        typeText(usernameField, username);
+        typeTextWithRetry(usernameField, username);
     }
 
+    /**
+     * Enter password
+     */
     public void enterPassword(String password) {
-        typeText(passwordField, password);
+        typeTextWithRetry(passwordField, password);
     }
 
-    /** Click login button */
+    /**
+     * Click login button
+     */
     public void clickLogin() {
-        driver.findElement(loginButton).click();
+        click(loginButton); // Use BasePage click method
     }
 
-    /** Get error message text */
+    /**
+     * Get error message text
+     * @return trimmed error message
+     */
     public String getErrorMessage() {
-        return driver.findElement(errorMessage).getText().trim();
+        return getText(errorMessage); // Use BasePage getText
     }
+
+    /**
+     * Future Best Practices:
+     * - Add methods for "remember me" checkbox, forgot password link
+     * - Add logging wrapper instead of System.out.println
+     */
 }

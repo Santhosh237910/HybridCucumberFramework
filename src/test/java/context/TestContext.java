@@ -3,78 +3,101 @@ package context;
 import io.restassured.response.Response;
 import managers.PageObjectManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Thread-safe TestContext to hold scenario-specific data and PageObjectManager
+ * - Each scenario/thread has its own TestContext instance via ThreadLocal
+ * - Stores PageObjectManager, ScenarioContext, and API response per scenario
  */
 public class TestContext {
 
-    // ThreadLocal ensures each thread (scenario) has its own TestContext instance
+    // ThreadLocal ensures each thread (scenario) has its own TestContext
     private static final ThreadLocal<TestContext> context = ThreadLocal.withInitial(TestContext::new);
 
-    private final PageObjectManager pageObjectManager;
+    private final PageObjectManager pageObjectManager; // Lazily initialized per scenario
+    private final ScenarioContext scenarioContext;     // Key-value storage per scenario
+    private Response apiResponse;                       // Optional API response storage
 
-    // Optional: store scenario-specific key-value data
-    private final ScenarioContext scenarioContext;
-
-    // ✅ Add API response storage
-    private Response apiResponse;
-
+    // Private constructor to enforce ThreadLocal usage
     private TestContext() {
         this.pageObjectManager = new PageObjectManager();
         this.scenarioContext = new ScenarioContext();
     }
 
-    /** Get the current thread's TestContext */
+    /**
+     * Get the TestContext for the current thread/scenario
+     */
     public static TestContext get() {
         return context.get();
     }
 
-    /** Get PageObjectManager for current thread/scenario */
+    /**
+     * Get PageObjectManager instance for current scenario
+     */
     public PageObjectManager getPageObjectManager() {
         return pageObjectManager;
     }
 
-    /** Get scenario-specific context */
+    /**
+     * Get ScenarioContext instance for current scenario
+     */
     public ScenarioContext getScenarioContext() {
         return scenarioContext;
     }
 
-    /** Clear TestContext for current thread (after scenario) */
+    /**
+     * Clear TestContext for current thread (typically called after scenario)
+     */
     public static void clear() {
         context.remove();
     }
 
     /**
-     * Inner class to store scenario-specific key-value data
-     * Example: temporarily storing username, IDs, tokens per scenario
+     * Store API response for current scenario
      */
-    public static class ScenarioContext {
-        private final java.util.Map<String, Object> data = new java.util.HashMap<>();
-
-        public void set(String key, Object value) {
-            data.put(key, value);
-        }
-
-        public Object get(String key) {
-            return data.get(key);
-        }
-
-        public boolean contains(String key) {
-            return data.containsKey(key);
-        }
-
-        public void clear() {
-            data.clear();
-        }
-    }
-
-    // ✅ API response getter/setter
     public void setApiResponse(Response response) {
         this.apiResponse = response;
     }
 
+    /**
+     * Retrieve API response for current scenario
+     */
     public Response getApiResponse() {
         return apiResponse;
     }
-}
 
+    /**
+     * Thread-safe ScenarioContext implementation
+     */
+    public static class ScenarioContext {
+        private final Map<String, Object> data = new HashMap<>();
+
+        /** Store value in scenario context */
+        public void set(String key, Object value) {
+            data.put(key, value);
+        }
+
+        /** Retrieve value from scenario context */
+        public Object get(String key) {
+            return data.get(key);
+        }
+
+        /** Type-safe retrieval */
+        public <T> T get(String key, Class<T> clazz) {
+            Object value = data.get(key);
+            return value != null ? clazz.cast(value) : null;
+        }
+
+        /** Check if key exists */
+        public boolean contains(String key) {
+            return data.containsKey(key);
+        }
+
+        /** Clear scenario context */
+        public void clear() {
+            data.clear();
+        }
+    }
+}

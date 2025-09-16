@@ -1,21 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
-    <Appenders>
-        <!-- Console logs -->
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%level] %logger{1} - %msg%n"/>
-        </Console>
 
-        <!-- File logs -->
-        <File name="FileLog" fileName="logs/test.log" append="false">
-            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}] [%level] %logger{1} - %msg%n"/>
-        </File>
+    <Properties>
+        <!-- Base directory for logs -->
+        <property name="LOG_DIR">target/logs</property>
+    </Properties>
+
+    <Appenders>
+
+        <!-- Console logs (async for performance) -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t] [%level] %logger{1} - %msg%n"/>
+        </Console>
+        <Async name="AsyncConsole">
+            <AppenderRef ref="Console"/>
+        </Async>
+
+        <!-- Rolling file log (Windows-safe) -->
+        <RollingFile name="RollingFile"
+                     fileName="${LOG_DIR}/test.log"
+                     filePattern="${LOG_DIR}/archive/test-%d{yyyy-MM-dd-HH-mm}.log.gz">
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}] [%t] [%level] %logger{1} - %msg%n"/>
+            <Policies>
+                <!-- Roll every day -->
+                <TimeBasedTriggeringPolicy />
+                <!-- Roll if file exceeds 10MB -->
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+        </RollingFile>
+        <Async name="AsyncRollingFile">
+            <AppenderRef ref="RollingFile"/>
+        </Async>
+
     </Appenders>
 
     <Loggers>
+        <!-- Root logger writes to console + rolling file -->
         <Root level="info">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="FileLog"/>
+            <AppenderRef ref="AsyncConsole"/>
+            <AppenderRef ref="AsyncRollingFile"/>
         </Root>
     </Loggers>
 </Configuration>

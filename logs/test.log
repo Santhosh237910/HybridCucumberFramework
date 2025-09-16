@@ -1,8 +1,0 @@
-[2025-09-15 23:23:34] [INFO] ApplicationHooks - Starting browser...
-[2025-09-15 23:23:34] [INFO] ApplicationHooks - Starting browser...
-[2025-09-15 23:23:43] [INFO] ApplicationHooks - Navigated to: https://the-internet.herokuapp.com
-[2025-09-15 23:23:44] [INFO] ApplicationHooks - Closing browser for scenario: Login failure with invalid credentials
-[2025-09-15 23:23:44] [INFO] ApplicationHooks - Scenario passed: Login failure with invalid credentials
-[2025-09-15 23:23:47] [INFO] ApplicationHooks - Navigated to: https://the-internet.herokuapp.com
-[2025-09-15 23:23:48] [INFO] ApplicationHooks - Closing browser for scenario: Login failure with invalid credentials
-[2025-09-15 23:23:48] [INFO] ApplicationHooks - Scenario passed: Login failure with invalid credentials

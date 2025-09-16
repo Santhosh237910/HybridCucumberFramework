@@ -8,28 +8,35 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.ConfigReader;
 
+import java.time.Duration;
+
+/**
+ * Thread-safe WebDriver factory
+ * - Uses ThreadLocal to maintain a separate driver instance per scenario/thread
+ * - Supports Chrome, Firefox, Edge
+ * - Handles headless mode, driver version via config, implicit waits, page load timeout
+ */
 public class DriverFactory {
 
-    // 🔹 ThreadLocal ensures each thread (scenario) gets its own WebDriver instance
-    // - Useful for parallel execution
+    // 🔹 ThreadLocal ensures each thread/scenario gets its own WebDriver
     private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
-    // 🔹 private constructor → prevents instantiation of this utility class
+    // 🔹 Private constructor prevents instantiation
     private DriverFactory() {}
 
     /**
      * Initialize WebDriver instance for the current thread
      *
      * @param browser       Browser type (chrome, firefox, edge)
-     * @param driverVersion Driver version to use (empty/null = latest)
-     * @return Thread-specific WebDriver instance
+     * @param driverVersion Specific driver version to use (latest if null/empty)
+     * @return Thread-specific WebDriver
      */
     public static WebDriver initDriver(String browser, String driverVersion) {
 
-        // Validate browser name is not null/empty
+        // Validate browser name
         if (browser == null || browser.isBlank()) {
             throw new IllegalArgumentException("Browser name cannot be null or empty");
         }
@@ -45,10 +52,8 @@ public class DriverFactory {
 
                 case "chrome" -> {
                     ChromeOptions options = new ChromeOptions();
-                    // Add headless argument if configured
                     if (headless) options.addArguments("--headless=new");
 
-                    // Setup driver version via WebDriverManager
                     if (driverVersion != null && !driverVersion.isEmpty()) {
                         WebDriverManager.chromedriver().driverVersion(driverVersion).setup();
                     } else {
@@ -61,22 +66,26 @@ public class DriverFactory {
                 case "firefox" -> {
                     FirefoxOptions options = new FirefoxOptions();
                     if (headless) options.addArguments("--headless=new");
+
                     if (driverVersion != null && !driverVersion.isEmpty()) {
                         WebDriverManager.firefoxdriver().driverVersion(driverVersion).setup();
                     } else {
                         WebDriverManager.firefoxdriver().setup();
                     }
+
                     webdriver = new FirefoxDriver(options);
                 }
 
                 case "edge" -> {
                     EdgeOptions options = new EdgeOptions();
                     if (headless) options.addArguments("--headless=new");
+
                     if (driverVersion != null && !driverVersion.isEmpty()) {
                         WebDriverManager.edgedriver().driverVersion(driverVersion).setup();
                     } else {
                         WebDriverManager.edgedriver().setup();
                     }
+
                     webdriver = new EdgeDriver(options);
                 }
 
@@ -86,11 +95,18 @@ public class DriverFactory {
             // Store driver in ThreadLocal for thread safety
             driver.set(webdriver);
 
-            // Maximize browser window (can add timeouts/cookies if needed)
-            getDriver().manage().window().maximize();
+            // Maximize browser window
+            webdriver.manage().window().maximize();
+
+            // Set implicit wait from config (default = 10 seconds)
+            long implicitWait = Long.parseLong(ConfigReader.get("implicitWait", "10"));
+            webdriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
+
+            // Set page load timeout (default = 30 seconds)
+            long pageLoadTimeout = Long.parseLong(ConfigReader.get("pageLoadTimeout", "30"));
+            webdriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(pageLoadTimeout));
         }
 
-        // Return thread-specific WebDriver instance
         return driver.get();
     }
 
