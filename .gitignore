@@ -1,0 +1,30 @@
+# Maven build folders
+target/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+
+# Eclipse files
+.project
+.classpath
+.settings/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Allure reports
+allure-results/
+allure-report/
+
+# Cucumber reports (if you ever generate them)
+cucumber-reports/
+
+# Temporary files
+*.tmp
+*.bak
